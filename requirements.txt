@@ -1,0 +1,2 @@
+# Run the normal setup.py and get all the normal PyPI dependencies from there
+-e .

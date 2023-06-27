@@ -1,0 +1,59 @@
+Class : BehaviouralObjects
+
+__init__(self, test_data_dir="/test_data/test_data")
+ - Initialise internal variable "test_data_dir"
+ - Instantiate "FedoraApi" and "CreateObjects"
+ - "CreateObjects" is told to create data in "test_data_dir"
+
+_create_file(self, file_type)
+ - Create a file of the relevant type by making a call to
+   "CreateObjects".
+
+_create_object_by_post(self, container_id, files)
+ - Create transaction : fcrepo().create_transaction()
+ - Start keep alive process
+ - Create container : fcrepo().create_container()
+ - Create file (using _create_file() above)
+ - Add file
+   -- For Very large binary : fcrepo().add_external_file()
+   -- Otherwise : fcrepo().post_file
+ - fcrepo().commit_transaction()
+
+_create_object(self, container_id, files)
+ - Create transaction : fcrepo().create_transaction()
+ - Start keep alive process
+ - Create container : fcrepo().create_container()
+ - Create file (using _create_file() above)
+ - Add file
+   -- For metadata : fcrepo().add_external_file()
+   -- Otherwise : fcrepo().post_file
+ - fcrepo().commit_transaction()
+
+_collate_results(self, action, final_result, result)
+ - For action != status, add it to the result of the current object
+ - For action = status, add "msg"=False if any of the sub-processes failed. True otherwise.
+ - Return the result.
+
+_start_keep_alive_subprocess(self, atomic_id)
+ - Run the process "ocfl_interfaces/fedora/keep_alive.py" to keep the
+   transaction with the argument "atomic_id" is kept alive until it
+   is completed.
+ - Run a ping every 150 seconds to check if transaction is completed
+ - Note : A transaction in fcrepo is automatically closed and rolled back after 3 minutes
+          of inactivity. This process avoids this happening for large uploads
+ - Above process is forked and exits on its own. Process is not tracked.
+
+create_metadata_object(self)
+ - Create a metadata file
+create_binary_file_objects(self)
+ - Create 2 files of size 5MB and a 2KB metadata file
+create_large_binary_file_objects(self)
+ - Create 5 files of size 1GB and a 2KB metadata file
+create_complex_binary_file_objects(self)
+ - Create 100 files of size 500 MB and a 2KB metadata file
+create_very_large_binary_file_objects(self)
+ - Create 1 file of size 256 GB and a 2KB metadata file
+
+copy_file_to_fedora(self, local_file_path)
+ - Copy file from location in "SHARED_DATA_FOLDER_LOCAL" to
+   "SHARED_DATA_FOLDER_FCREPO"

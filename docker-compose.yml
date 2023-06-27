@@ -1,0 +1,50 @@
+version: '3'
+
+volumes:
+  db-fcrepo:
+  fcrepo:
+  # ocfl-root:
+
+networks:
+  internal:
+
+services:
+  fcrepo:
+    image: fcrepo/fcrepo:6.3.0-SNAPSHOT
+    expose:
+      - 8080
+    ports:
+      - 8080:8080
+    env_file:
+      - .env
+    networks:
+      internal:
+    depends_on:
+      - fcrepodb
+    volumes:
+      - fcrepo:$FCREPO_HOME
+      - ./fcrepo.properties:/data/fcrepo.properties
+      - ./ocfl_objects:$OCFL_ROOT
+      - ./shared_data:/data/shared_data
+    environment:
+      - CATALINA_OPTS=-Dfcrepo.home=$FCREPO_HOME -Dfcrepo.config.file=/data/fcrepo.properties
+
+  fcrepodb:
+    image: postgres:15-alpine
+    networks:
+      internal:
+    env_file:
+      - .env
+    expose:
+      - 5432
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+    volumes:
+      - db-fcrepo:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "POSTGRES_PASSWORD=${POSTGRES_PASSWORD} pg_isready -U ${POSTGRES_USER} -h localhost -d ${POSTGRES_DB}"]
+      interval: 30s
+      timeout: 5s
+      retries: 3

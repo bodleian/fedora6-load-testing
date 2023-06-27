@@ -1,0 +1,17 @@
+**/__pycache__/*
+*.egg-info/
+ocfl_objects/*
+!ocfl_objects/0\=ocfl_1.1
+test_data/*
+shared_data/*
+!shared_data/.keep
+!shared_data/allow.txt
+.env
+Results/BAUTestResults/*
+Results/DownloadTestResults/*
+Results/default-hardware/*
+Results/new1PBDrive/*
+Results/newhw-1Feb2023/*
+Results/preliminaryResults/*
+Results/uploadByExternalContent/*
+

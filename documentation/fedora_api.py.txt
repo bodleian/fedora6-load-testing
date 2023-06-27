@@ -1,0 +1,81 @@
+Use http.client python library to talk to the fcrepo instance.
+ - This is the only stable library we have so far been able to find that
+   works reliably with fcrepo.
+
+__init__(self):
+ - Set basic information from the environment variables
+   HOST, PORT, USERNAME, PASSWORD, BASE_URL, OCFL-ROOT, ...
+
+_get_mime_type(self, file_path):
+ - Use python library function mimetypes.guess_type to guess the type of the file
+   and return the mime type.
+ - Return FileNotFoundError if the file in question is not found
+
+_http_request(self, method="GET", url="", payload="", headers={}):
+ - This function is our main interface to the fcrepo web server.
+ - Use http.client python library
+   -- Create a http connection
+   -- Set up a connection request
+   -- Send the request and get a response
+   -- Close the connection
+   -- Parse the response to get the following information
+      status_code, status, location, link, body, reason(message)
+
+_get_location_from_link(self, res):
+ - Extract the "location of the original link" from the headers
+
+create_transaction(self):
+ - Create a new transaction (fcr:tx) using a POST
+   https://wiki.lyrasis.org/display/FEDORA6x/RESTful+HTTP+API+-+Transactions#RESTfulHTTPAPITransactions-BluePOSTCreateanewtransaction
+ - Note that this transaction is rolled back if there is no activity for 3 minutes
+
+keep_transaction_alive(self, atomic_id):
+ - Keep the transaction referred to by atomic_id alive by making a POST to fcrepo
+ - Note : Mainly called by "keep_alive.py"
+
+commit_transaction(self, atomic_id):
+ - Close the transaction defined by the atomic_id URL by committing it (PUT)
+
+create_container(self, container_id=None, archival_group=True, atomic_id=None):
+ - Create a container of given name (header:"Slug") and if required, type "ArchivalGroup"
+ - Note: the ArchivalGroup helps in getting versioning working
+   -- https://wiki.lyrasis.org/display/FEDORA6x/Glossary#Glossary-ArchivalGroupag
+   -- https://wiki.lyrasis.org/display/FEDORA6x/RESTful+HTTP+API+-+Containers#RESTfulHTTPAPIContainers-BluePOSTCreatenewresourceswithinaLDPcontainer
+
+create_new_version(self, container_id):
+ - Create a new version of the container
+   -- https://wiki.lyrasis.org/display/FEDORA6x/RESTful+HTTP+API+-+Versioning#RESTfulHTTPAPIVersioning-Workingwithaversionscontainer(aLDPCv)
+
+get_information(self, container_id=None):
+ - Retrieve the information about the container
+ - Does not work right now
+
+post_file(self, container_id, file_path, file_location=None, atomic_id=None, mime_type=None, sha1=None,
+                  sha256=None, sha512=None, calculate_digest=False):
+ - Add a file (add_file) to fcrepo using POST with the given parameters
+
+put_file(self, container_id, file_path, file_location=None, atomic_id=None, mime_type=None, sha1=None,
+                 sha256=None, sha512=None, calculate_digest=False):
+ - Add a file (add_file) to fcrepo using PUT with the given parameters
+
+add_external_file(self, method, container_id, local_file_path, server_file_path, file_location=None,
+          atomic_id=None, mime_type=None, sha1=None, sha256=None, sha512=None, calculate_digest=False):
+ - Add an external file to the container
+   -- Determine mime_type
+   -- Add headers "Link", "Slug", "Atomic-ID"
+   -- Add file_location or file_name to the URL as needed
+      --- Note, we are passing the location to the file in the URL
+   -- Send a http request to fcrepo with the given method
+      --- The payload of the http.client is empty
+
+add_file(self, method, container_id, file_path, file_location=None, atomic_id=None, mime_type=None, sha1=None,
+ - Add a file to the container
+   -- Determine mime_type
+   -- Add headers "Link", "Slug", "Atomic-ID"
+   -- Add file_location or file_name to the URL as needed
+   -- Send a http request to fcrepo with the given method
+      --- Pass the file contents as the "payload" for the http.client
+
+
+get_ocfl_object_path(self, container_id):
+ - Figure out the actual path of the container by decoding the container id
