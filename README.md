@@ -1,32 +1,8 @@
-# DPS
+# Fedora 6 Load Testing
 
 This is a project to manage code and tests related to the ORA-developed test of Fedora 6 as an API layer for the BDLSS Digital Preservation Service.
 
 A description of the overall set of tasks and background can be found on the wiki: https://github.com/tomwrobel/dps/wiki/home
-
-## Getting Started with running [Fedora 6.x](https://wiki.lyrasis.org/display/FEDORA6x)
-Clone the repository with git clone https://github.com/tomwrobel/dps.git.
-
-Ensure you have docker and docker-compose. See [notes on installing docker](https://github.com/tomwrobel/dps/wiki/Installing-Docker).
-
-Open a console and try running `docker -h` and `docker-compose -h` to verify they are both accessible.
-
-### Copy the environment variables
-
-Copy the template environment variables file `.env.template` to `.env`. It has default values for working with Fedora running in docker.
-
-```
-cp .env.template .env
-```
-### Start the fedora 6 docker container
-
-Start the docker containers for Fedora 6
-```bash
-$ docker-compose up -d
-```
-You should see the containers being built and the services start.
-
-Note : This is only needed if you do not have a fedora 6 container provided. Skip if you have fedora 6 available as a service and add the connection details to the .env file.
 
 ## Testing Fedora6
 
